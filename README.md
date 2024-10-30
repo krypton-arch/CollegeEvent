@@ -55,7 +55,7 @@ The project consists of the following main components:
     - Place the HTML files (e.g., `my-rsvps.html`, `login.html`, and `index.html`) in the `webapp` folder.
     - Place the CSS files (e.g `styles.css`) in the `css` folder within `webapp`.
 
-4. **Database Setup** (Optional):
+4. **Database Setup**:
     - For a persistent RSVP system, configure a database (e.g., MySQL) and modify the servlet to handle database connections for storing and retrieving RSVPs.
 
 5. **Access the Application**:
