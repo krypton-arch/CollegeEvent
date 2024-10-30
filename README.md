@@ -103,10 +103,6 @@ The project consists of the following main components:
 3. Test your changes thoroughly before creating a pull request.
 4. Submit a detailed pull request explaining your changes.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Contact
 
 For further questions or feedback, please open an issue on GitHub or contact the project maintainer directly.
