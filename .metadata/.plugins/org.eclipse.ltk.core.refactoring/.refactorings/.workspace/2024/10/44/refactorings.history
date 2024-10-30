@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;CollegeEvent/src/main/webapp/WEB-INF/lib/mysql-connector-j-9.0.0.jar&apos;" deleteContents="false" description="Delete resource &apos;CollegeEvent/src/main/webapp/WEB-INF/lib/mysql-connector-j-9.0.0.jar&apos;" element1="/CollegeEvent/src/main/webapp/WEB-INF/lib/mysql-connector-j-9.0.0.jar" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1730273956327"/>
+</session>

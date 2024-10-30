@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles2.css">
+    <title>College Event Management</title>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>College Event List</h1>
+        <div class="nav-links">
+            <a href="my_rsvps.html">My RSVPs</a>
+            <a href="login.html">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Upcoming Events</h2>
+        <table>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Freshman Orientation</td>
+                    <td>Welcome event for all incoming freshmen to learn about the college.</td>
+                    <td><button class="btn" onclick="registerEvent('Freshman Orientation')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Career Fair</td>
+                    <td>Meet potential employers and learn about job opportunities.</td>
+                    <td><button class="btn" onclick="registerEvent('Career Fair')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Annual Sports Day</td>
+                    <td>A day of sports events and competitions among students.</td>
+                    <td><button class="btn" onclick="registerEvent('Annual Sports Day')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Graduation Ceremony</td>
+                    <td>Ceremony to celebrate the graduation of students.</td>
+                    <td><button class="btn" onclick="registerEvent('Graduation Ceremony')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Cultural Fest</td>
+                    <td>A showcase of cultural performances from various student groups.</td>
+                    <td><button class="btn" onclick="registerEvent('Cultural Fest')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Tech Expo</td>
+                    <td>An exhibition of tech projects and innovations by students.</td>
+                    <td><button class="btn" onclick="registerEvent('Tech Expo')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Music Concert</td>
+                    <td>Live music concert featuring student and local bands.</td>
+                    <td><button class="btn" onclick="registerEvent('Music Concert')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Workshop on AI</td>
+                    <td>Interactive workshop on AI and machine learning concepts.</td>
+                    <td><button class="btn" onclick="registerEvent('Workshop on AI')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Debate Competition</td>
+                    <td>A competition for students to showcase their debating skills.</td>
+                    <td><button class="btn" onclick="registerEvent('Debate Competition')">Book Tickets</button></td>
+                </tr>
+                <tr>
+                    <td>Art Exhibition</td>
+                    <td>Exhibition of artwork created by students in the Fine Arts program.</td>
+                    <td><button class="btn" onclick="registerEvent('Art Exhibition')">Book Tickets</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="popup" id="popup">
+        <span class="popup-close" onclick="closePopup()">×</span>
+        <p id="popup-message"></p>
+    </div>
+
+    <script>
+        function registerEvent(eventName) {
+            // Trigger the servlet call
+            fetch('BookingServlet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ event: eventName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showPopup(`You have registered for ${eventName}.`);
+                } else {
+                    showPopup('Registration failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                showPopup('An error occurred: ' + error.message);
+            });
+        }
+
+        function showPopup(message) {
+            document.getElementById('popup-message').innerText = message;
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+package college;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+@WebServlet("/myRSVPs")
+public class MyRSVPsServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    // JDBC connection parameters
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/user_management";
+    private static final String JDBC_USER = "root";
+    private static final String JDBC_PASS = "root";
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
+        // Check if user is logged in by retrieving the user email from session
+        HttpSession session = request.getSession(false);
+        String userEmail = (session != null) ? (String) session.getAttribute("userEmail") : null;
+
+        if (userEmail == null) {
+            out.write(gson.toJson(new ErrorResponse("User not logged in")));
+            return;
+        }
+
+        // Retrieve user name from the database
+        String userName = getUserName(userEmail);
+        if (userName == null) {
+            out.write(gson.toJson(new ErrorResponse("User not found")));
+            return;
+        }
+
+        List<Booking> bookings = new ArrayList<>();
+
+        // Database connection and retrieval of user RSVPs
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS)) {
+            String query = "SELECT id, event_name, booking_date FROM bookings WHERE user_email = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, userEmail);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    Booking booking = new Booking(
+                            resultSet.getInt("id"), // Get the booking ID
+                            resultSet.getString("event_name"),
+                            resultSet.getString("booking_date"));
+                    bookings.add(booking);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            out.write(gson.toJson(new ErrorResponse("Database error")));
+            return;
+        }
+
+        // Respond with user's name and their bookings
+        out.write(gson.toJson(new UserRSVPsResponse(userName, bookings)));
+    }
+
+    // New method to cancel a booking
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
+        // Check if user is logged in
+        HttpSession session = request.getSession(false);
+        String userEmail = (session != null) ? (String) session.getAttribute("userEmail") : null;
+
+        if (userEmail == null) {
+            out.write(gson.toJson(new ErrorResponse("User not logged in")));
+            return;
+        }
+
+        // Get the booking ID to cancel
+        String bookingIdParam = request.getParameter("bookingId");
+        if (bookingIdParam == null || bookingIdParam.isEmpty()) {
+            out.write(gson.toJson(new ErrorResponse("Invalid booking ID")));
+            return;
+        }
+
+        int bookingId = Integer.parseInt(bookingIdParam);
+
+        // Cancel the booking
+        boolean isCancelled = cancelBooking(bookingId, userEmail);
+        if (isCancelled) {
+            out.write(gson.toJson(new SuccessResponse("Booking cancelled successfully")));
+        } else {
+            out.write(gson.toJson(new ErrorResponse("Failed to cancel booking")));
+        }
+    }
+
+    private String getUserName(String email) {
+        String name = null;
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT name FROM users WHERE email = ?")) {
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                name = resultSet.getString("name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return name;
+    }
+
+    private boolean cancelBooking(int bookingId, String userEmail) {
+        boolean isCancelled = false;
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "DELETE FROM bookings WHERE id = ? AND user_email = ?")) {
+            preparedStatement.setInt(1, bookingId);
+            preparedStatement.setString(2, userEmail);
+            int rowsAffected = preparedStatement.executeUpdate();
+            isCancelled = (rowsAffected > 0); // Return true if a booking was deleted
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isCancelled;
+    }
+
+    // Response classes for structured JSON output
+    private static class UserRSVPsResponse {
+        private final String name;
+        private final List<Booking> bookings;
+
+        public UserRSVPsResponse(String name, List<Booking> bookings) {
+            this.name = name;
+            this.bookings = bookings;
+        }
+    }
+
+    private static class Booking {
+        private final int id; // Add booking ID
+        private final String eventName;
+        private final String bookingDate;
+
+        public Booking(int id, String eventName, String bookingDate) {
+            this.id = id;
+            this.eventName = eventName;
+            this.bookingDate = bookingDate;
+        }
+    }
+
+    private static class ErrorResponse {
+        private final String message;
+
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+    }
+
+    private static class SuccessResponse {
+        private final String message;
+
+        public SuccessResponse(String message) {
+            this.message = message;
+        }
+    }
+}

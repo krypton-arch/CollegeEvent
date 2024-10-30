@@ -1,0 +1,85 @@
+/* Apply background image and styling */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('images.jpeg') center/cover no-repeat;
+    color: #fff;
+}
+
+/* Box styling for login and registration forms */
+.login-box, .register-box {
+    background-color: rgba(255, 255, 255, 0.9); /* semi-transparent white */
+    color: #4B0000; /* maroon text color */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 320px;
+}
+
+.login-box h2, .register-box h2 {
+    margin-bottom: 1.75rem;
+    color: #4B0000;
+}
+
+/* Input fields styling */
+.login-box input[type="email"],
+.login-box input[type="password"],
+.register-box input[type="text"],
+.register-box input[type="email"],
+.register-box input[type="password"] {
+    width: 90%;
+    padding: 0.7rem;
+    margin: 0.8rem 0;
+    border: 1px solid #4B0000;
+    border-radius: 7px;
+    background-color: #FFF3E0; /* cream background */
+    color: #4B0000;
+    font-size: 1rem;
+}
+
+input::placeholder {
+    color: #4B0000;
+    opacity: 0.7;
+}
+
+/* Button styling */
+.login-box input[type="submit"],
+.register-box input[type="submit"] {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #4B0000; /* maroon background */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+}
+
+.login-box input[type="submit"]:hover,
+.register-box input[type="submit"]:hover {
+    background-color: #6E0D25; /* darker maroon on hover */
+}
+
+/* Link to registration page */
+.register-link {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #4B0000;
+}
+
+.register-link a {
+    text-decoration: none;
+    color: #6E0D25;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}

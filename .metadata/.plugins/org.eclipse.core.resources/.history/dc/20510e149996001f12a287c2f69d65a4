@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles3.css">
+    <title>My RSVPs - College Event Management</title>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>My RSVPs</h1>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="login.html">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 id="greeting"></h2>
+        <table id="rsvp-table">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Description</th>
+                    <th>Booking Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- RSVP bookings will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch RSVPs on page load
+        window.onload = function() {
+            fetch('MyRSVPsServlet')
+                .then(response => response.json())
+                .then(data => {
+                    // Display greeting
+                    document.getElementById('greeting').innerText = `Hello, ${data.name}! Here are your bookings:`;
+
+                    // Populate the table with the bookings
+                    const tbody = document.getElementById('rsvp-table').getElementsByTagName('tbody')[0];
+                    data.bookings.forEach(booking => {
+                        const row = tbody.insertRow();
+                        row.insertCell(0).innerText = booking.eventName;
+                        row.insertCell(1).innerText = booking.bookingDate;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching RSVPs:', error);
+                });
+        };
+    </script>
+</body>
+</html>

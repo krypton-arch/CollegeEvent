@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
+         version="3.1">
+
+    <display-name>College Event Management</display-name>
+    
+    <context-param>
+        <param-name>loginPage</param-name>
+        <param-value>/login.html</param-value>
+    </context-param>
+    <context-param>
+        <param-name>registrationPage</param-name>
+        <param-value>/register.html</param-value>
+    </context-param>
+    <context-param>
+        <param-name>dashboardPage</param-name>
+        <param-value>/home.html</param-value>
+    </context-param>
+    <context-param>
+        <param-name>rsvpConfirmationPage</param-name>
+        <param-value>/my_rsvps.html</param-value>
+    </context-param>
+    <context-param>
+        <param-name>stylesheet</param-name>
+        <param-value>/styles.css</param-value>
+    </context-param>
+    <context-param>
+        <param-name>stylesheet</param-name>
+        <param-value>/styles2.css</param-value>
+    </context-param>
+    <context-param>
+        <param-name>stylesheet</param-name>
+        <param-value>/styles3.css</param-value>
+    </context-param>
+
+    <!-- Servlet for Login -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>college.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for Registration -->
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>college.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for Booking Tickets -->
+    <servlet>
+        <servlet-name>BookTicketServlet</servlet-name>
+        <servlet-class>college.BookTicketServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookTicketServlet</servlet-name>
+        <url-pattern>/BookTicketServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for My RSVPs -->
+    <servlet>
+        <servlet-name>MyRSVPsServlet</servlet-name>
+        <servlet-class>college.MyRSVPsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MyRSVPsServlet</servlet-name>
+        <url-pattern>/MyRSVPsServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Error Page Configuration -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error.html</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/error.html</location>
+    </error-page>
+
+</web-app>

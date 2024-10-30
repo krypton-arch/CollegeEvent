@@ -1,0 +1,20 @@
+package college;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class dbms {
+    public static void main(String[] args) {
+        String jdbcUrl = "jdbc:mysql://localhost:3306/user_management";
+        String jdbcUser = "root";
+        String jdbcPass = "root";
+
+        try {
+            Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass);
+            System.out.println("Database connection successful!");
+            connection.close();
+        } catch (SQLException e) {
+            System.err.println("Database connection failed: " + e.getMessage());
+        }
+    }
+}

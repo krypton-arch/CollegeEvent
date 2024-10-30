@@ -1,0 +1,80 @@
+package college;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    // JDBC connection parameters
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/user_management";
+    private static final String JDBC_USER = "root";
+    private static final String JDBC_PASS = "root";
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // Set response type to HTML
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        // Retrieve login credentials from form
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        // Simple input validation
+        if (email == null || password == null || email.isEmpty() || password.isEmpty()) {
+            out.println("<h3>Error: Both email and password are required!</h3>");
+            return;
+        }
+
+        // Load MySQL JDBC Driver
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            out.println("<h3>Error: MySQL JDBC Driver not found.</h3>");
+            e.printStackTrace();
+            return;
+        }
+
+        // Database connection and user authentication
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS);
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT * FROM users WHERE email=? AND password=?")) {
+
+            // Set parameters for the SQL query
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, password);
+
+            // Execute query and validate credentials
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                // Successful login, redirect to home page
+                response.sendRedirect("home.html");
+            } else {
+                // Invalid credentials, redirect back to login with error message
+                response.sendRedirect("login.html?error=Invalid%20Credentials");
+            }
+
+        } catch (SQLException e) {
+            // Log SQL errors
+            out.println("<h3>Error: Unable to connect to the database.</h3>");
+            out.println("<p>SQL State: " + e.getSQLState() + "</p>");
+            out.println("<p>Error Code: " + e.getErrorCode() + "</p>");
+            out.println("<p>Message: " + e.getMessage() + "</p>");
+            e.printStackTrace();
+        }
+    }
+}

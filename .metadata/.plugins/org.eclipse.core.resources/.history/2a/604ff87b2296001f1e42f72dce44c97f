@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+         https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd" 
+         version="5.0">
+
+    <display-name>College Event Management</display-name>
+
+    <!-- Welcome File -->
+    <welcome-file-list>
+        <welcome-file>login.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- Servlet for Login -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>your.package.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for Registration -->
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>your.package.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for Booking Tickets -->
+    <servlet>
+        <servlet-name>BookTicketServlet</servlet-name>
+        <servlet-class>your.package.BookTicketServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BookTicketServlet</servlet-name>
+        <url-pattern>/BookTicketServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Servlet for My RSVPs -->
+    <servlet>
+        <servlet-name>MyRSVPsServlet</servlet-name>
+        <servlet-class>your.package.MyRSVPsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MyRSVPsServlet</servlet-name>
+        <url-pattern>/MyRSVPsServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome Page Servlet -->
+    <servlet>
+        <servlet-name>WelcomeServlet</servlet-name>
+        <servlet-class>your.package.WelcomeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WelcomeServlet</servlet-name>
+        <url-pattern>/welcome.html</url-pattern>
+    </servlet-mapping>
+
+    <!-- Error Page Configuration -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error.html</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Exception</exception-type>
+        <location>/error.html</location>
+    </error-page>
+
+</web-app>

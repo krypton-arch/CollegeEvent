@@ -1,0 +1,103 @@
+package college;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+@WebServlet("/myRSVPs")
+public class MyRSVPsServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    // JDBC connection parameters
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/user_management";
+    private static final String JDBC_USER = "root";
+    private static final String JDBC_PASS = "root";
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
+        // Check if user is logged in by retrieving the user email and name from session
+        HttpSession session = request.getSession(false);
+        String userEmail = (session != null) ? (String) session.getAttribute("userEmail") : null;
+        String userName = (session != null) ? (String) session.getAttribute("userName") : "Guest";
+
+        if (userEmail == null) {
+            out.write(gson.toJson(new ErrorResponse("User not logged in")));
+            return;
+        }
+
+        List<Booking> bookings = new ArrayList<>();
+
+        // Database connection and retrieval of user RSVPs
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASS)) {
+            String query = "SELECT event_name, booking_date FROM bookings WHERE user_email = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, userEmail);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    Booking booking = new Booking(
+                            resultSet.getString("event_name"),
+                            resultSet.getString("booking_date"));
+                    bookings.add(booking);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            out.write(gson.toJson(new ErrorResponse("Database error")));
+            return;
+        }
+
+        // Respond with user's name and their bookings
+        out.write(gson.toJson(new UserRSVPsResponse(userName, bookings)));
+    }
+
+    // Response classes for structured JSON output
+    private static class UserRSVPsResponse {
+        private final String name;
+        private final List<Booking> bookings;
+
+        public UserRSVPsResponse(String name, List<Booking> bookings) {
+            this.name = name;
+            this.bookings = bookings;
+        }
+    }
+
+    private static class Booking {
+        private final String eventName;
+        private final String bookingdate;
+
+        public Booking(String eventName, String bookingTime) {
+            this.eventName = eventName;
+            this.bookingdate = bookingTime;
+        }
+    }
+
+    private static class ErrorResponse {
+        private final String message;
+
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+    }
+}

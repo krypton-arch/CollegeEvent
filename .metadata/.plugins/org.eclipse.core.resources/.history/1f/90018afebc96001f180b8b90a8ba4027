@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles3.css">
+    <title>My RSVPs - College Event Management</title>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>My RSVPs</h1>
+        <div class="nav-links">
+            <a href="home.html">Home</a>
+            <a href="login.html">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 id="greeting"></h2>
+        <table id="rsvp-table">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Description</th>
+                    <th>Booking Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- RSVP bookings will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+        <p id="no-rsvps" style="display: none;">You currently have no RSVPs.</p>
+    </div>
+
+    <script>
+        // Fetch RSVPs on page load
+        window.onload = async function() {
+            try {
+                const response = await fetch('myRSVPs');
+                const data = await response.json();
+
+                // Display greeting with user name
+                document.getElementById('greeting').innerText = `Hello, ${data.name}! Here are your bookings:`;
+
+                const tbody = document.getElementById('rsvp-table').getElementsByTagName('tbody')[0];
+
+                // Check if there are any bookings
+                if (data.bookings && data.bookings.length > 0) {
+                    // Populate the table with bookings data
+                    data.bookings.forEach(booking => {
+                        const row = tbody.insertRow();
+                        row.insertCell(0).innerText = booking.eventName;
+                        row.insertCell(1).innerText = booking.description || 'No description available';
+                        row.insertCell(2).innerText = booking.bookingdate;
+
+                        // Create cancel button and add to table
+                        const cancelCell = row.insertCell(3);
+                        const cancelButton = document.createElement('button');
+                        cancelButton.innerText = 'Cancel';
+                        cancelButton.onclick = () => cancelBooking(booking.eventName, row);
+                        cancelCell.appendChild(cancelButton);
+                    });
+                } else {
+                    // Show message if no RSVPs are found
+                    document.getElementById('no-rsvps').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error fetching RSVPs:', error);
+                document.getElementById('greeting').innerText = 'Unable to load your bookings at this time.';
+            }
+        };
+
+        // Function to cancel a booking
+        async function cancelBooking(eventName, row) {
+            try {
+                const response = await fetch('cancelBooking', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ eventName })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    row.remove(); // Remove the row from the table
+                    // Show message if table is empty after deletion
+                    const tbody = document.getElementById('rsvp-table').getElementsByTagName('tbody')[0];
+                    if (tbody.rows.length === 0) {
+                        document.getElementById('no-rsvps').style.display = 'block';
+                    }
+                } else {
+                    alert('Failed to cancel the booking. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error cancelling booking:', error);
+                alert('Error cancelling booking. Please try again later.');
+            }
+        }
+    </script>
+</body>
+</html>

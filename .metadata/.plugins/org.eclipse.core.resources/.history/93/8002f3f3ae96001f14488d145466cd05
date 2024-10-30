@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles2.css">
+    <title>College Event Management</title>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>College Event List</h1>
+        <div class="nav-links">
+            <a href="my_rsvps.html">My RSVPs</a>
+            <a href="login.html">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Upcoming Events</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="event-list">
+                <!-- Events will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="popup" id="popup">
+        <span class="popup-close" onclick="closePopup()">×</span>
+        <p id="popup-message"></p>
+    </div>
+
+    <script>
+        // Event list
+        const events = [
+            { name: 'Freshman Orientation', description: 'Welcome event for all incoming freshmen to learn about the college.' },
+            { name: 'Career Fair', description: 'Meet potential employers and learn about job opportunities.' },
+            { name: 'Annual Sports Day', description: 'A day of sports events and competitions among students.' },
+            { name: 'Graduation Ceremony', description: 'Ceremony to celebrate the graduation of students.' },
+            { name: 'Cultural Fest', description: 'A showcase of cultural performances from various student groups.' },
+            { name: 'Tech Expo', description: 'An exhibition of tech projects and innovations by students.' },
+            { name: 'Music Concert', description: 'Live music concert featuring student and local bands.' },
+            { name: 'Workshop on AI', description: 'Interactive workshop on AI and machine learning concepts.' },
+            { name: 'Debate Competition', description: 'A competition for students to showcase their debating skills.' },
+            { name: 'Art Exhibition', description: 'Exhibition of artwork created by students in the Fine Arts program.' },
+        ];
+
+        // Load events into the table
+        function loadEvents() {
+            const eventList = document.getElementById('event-list');
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${event.name}</td>
+                    <td>${event.description}</td>
+                    <td><button class="btn" onclick="registerEvent('${event.name}')">Book Tickets</button></td>
+                `;
+                eventList.appendChild(row);
+            });
+        }
+
+        // Register for an event
+        async function registerEvent(eventName) {
+            try {
+                const response = await fetch('bookEvent', { // Updated to match the servlet mapping
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded', // Updated content type
+                    },
+                    body: new URLSearchParams({ event: eventName }) // Use URLSearchParams for form data
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showPopup(`You have successfully registered for ${eventName}.`);
+                } else {
+                    showPopup('Registration failed. Please try again.');
+                }
+            } catch (error) {
+                showPopup('An error occurred: ' + error.message);
+            }
+        }
+
+        // Show a popup message
+        function showPopup(message) {
+            document.getElementById('popup-message').innerText = message;
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        // Close the popup
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        // Load events when the page loads
+        document.addEventListener('DOMContentLoaded', loadEvents);
+    </script>
+</body>
+</html>

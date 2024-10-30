@@ -1,0 +1,61 @@
+
+
+import jakarta.servlet.ServletException;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import com.google.gson.Gson;
+
+@WebServlet("/BookingServlet")
+public class BookingServlet extends HttpServlet {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/user_management";
+    private static final String DB_USER = "your_username"; // Replace with your DB username
+    private static final String DB_PASSWORD = "your_password"; // Replace with your DB password
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        StringBuilder sb = new StringBuilder();
+        String event = request.getParameter("event");
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "INSERT INTO bookings (event_name, user_email) VALUES (?, ?)"; // Assuming you have a bookings table
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, event);
+            preparedStatement.setString(2, "user@example.com"); // Replace with actual user email from session
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            Gson gson = new Gson();
+            if (rowsAffected > 0) {
+                response.getWriter().write(gson.toJson(new Response(true)));
+            } else {
+                response.getWriter().write(gson.toJson(new Response(false)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write(new Gson().toJson(new Response(false)));
+        }
+    }
+
+    private static class Response {
+        private boolean success;
+
+        public Response(boolean success) {
+            this.success = success;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+    }
+}
+

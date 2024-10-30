@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="return loginUser(event)">
+                <div class="input-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <div class="loading" id="loading">Logging in...</div>
+            <div id="login-message"></div>
+            <div class="register-link">
+                <p>Don't have an account? <a href="register.html">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loginUser(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loadingIndicator = document.getElementById('loading');
+            const loginMessage = document.getElementById('login-message');
+
+            // Clear previous messages
+            loginMessage.innerText = '';
+            loadingIndicator.style.display = 'block'; // Show loading indicator
+
+            try {
+                const response = await fetch('login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ email, password })
+                });
+
+                const data = await response.json();
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                loginMessage.innerText = data.message;
+
+                if (data.success) {
+                    // Redirect to home.html on successful login
+                    window.location.href = 'home.html'; // Adjust this path as necessary
+                }
+            } catch (error) {
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                loginMessage.innerText = 'An error occurred: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

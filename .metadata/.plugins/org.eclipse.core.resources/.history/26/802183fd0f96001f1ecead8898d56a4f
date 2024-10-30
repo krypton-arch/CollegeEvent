@@ -1,0 +1,104 @@
+package college;
+
+import jakarta.servlet.ServletException;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.Gson;
+
+@WebServlet("/MyRSVPsServlet")
+public class MyRSVPsServlet extends HttpServlet {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/user_management";
+    private static final String DB_USER = "root"; // Replace with your DB username
+    private static final String DB_PASSWORD = "root"; // Replace with your DB password
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        
+        // Assuming user email is stored in session
+        String userEmail = (String) request.getSession().getAttribute("userEmail");
+        
+        List<Booking> bookings = new ArrayList<>();
+        String name = (String) request.getSession().getAttribute("userName"); // Fetch the user's name
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String query = "SELECT event_name, description, booking_date FROM bookings WHERE user_email = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userEmail);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Booking booking = new Booking();
+                booking.setEventName(resultSet.getString("event_name"));
+                booking.setBookingDate(resultSet.getString("booking_date"));
+                bookings.add(booking);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Gson gson = new Gson();
+        response.getWriter().write(gson.toJson(new UserRSVPs(name, bookings)));
+    }
+
+    private static class UserRSVPs {
+        private String name;
+        private List<Booking> bookings;
+
+        public UserRSVPs(String name, List<Booking> bookings) {
+            this.name = name;
+            this.bookings = bookings;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<Booking> getBookings() {
+            return bookings;
+        }
+    }
+
+    private static class Booking {
+        private String eventName;
+        private String description;
+        private String bookingDate;
+
+        public String getEventName() {
+            return eventName;
+        }
+
+        public void setEventName(String eventName) {
+            this.eventName = eventName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getBookingDate() {
+            return bookingDate;
+        }
+
+        public void setBookingDate(String bookingDate) {
+            this.bookingDate = bookingDate;
+        }
+    }
+}
+
